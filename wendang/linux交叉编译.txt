@@ -1,0 +1,28 @@
+linuxΩª≤Ê±‡“Î
+∆Ù∂Ølinuxµ˜ ‘£∫sudo putty
+mount -t nfs -o nolock 192.168.6.10:/home/nfsroot /mnt
+
+$ sudo xz -d gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabi.tar.xz
+$ ls
+$ sudo tar xvf gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabi.tar -C /opt/
+$ cd ~
+$ vim .bashrc
+export PATH=$PATH:/opt/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabi/bin/
+$ arm-linux-gnueabi-gcc -v
+$ arm-linux-gnueabi-gcc -o helloworld-arm helloworld.c
+$ ls
+$ ./helloworld-arm
+/opt/linuxban/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi-gcc -v
+
+$ gcc -o helloworld helloworld.c
+$ ls
+$ ./helloworld
+
+±‡“Îredis
+cd /home/nfsroot/redis-4.0.6/src
+export CC=/opt/linuxban/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi-gcc
+export LD=/opt/linuxban/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi-ld
+export RANLIB=/opt/linuxban/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi-ranlib
+make MALLOC=libc
+
+linuxΩª≤Ê±‡“Î
