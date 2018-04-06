@@ -1,0 +1,98 @@
+vim /etc/systemd/system/getty@tty1.service.d/autologin.conf
+ExecStart=
+ExecStart=-/sbin/agetty --autologin pi --noclear %I 115200 linux
+
+//////////////////////////////////////////////////////使用
+vim /etc/rc.local
+exec /sbin/getty -n -l /opt/runrfid.sh -8 115200 tty1
+//////////////////////////////////////////////////////使用
+
+agetty的作用
+ 分类： LINUX2017-03-09 13:23:31
+ agetty
+
+打开 tty
+端口，为登录名称建立命令控制符，并引出
+login
+程序
+如何使你的Linux系统省略输入用户名密码
+1、省略密码验证
+ 
+很简单，只需把/etc/passwd中的root:x:0:0:root:/root:/bin/bash，改为root::0:0:root:/root:/bin/bash，就可以了，就是去掉了里面的x，这样root用户就不用密码了。其他用户也一样。
+ 
+2、省略输入用户名
+ 
+(1)修改/etc/inittab
+ 
+在inittab中，有如下配置
+ 
+1:2345:respawn:/sbin/agetty tty1 9600
+2:2345:respawn:/sbin/agetty tty2 9600
+3:2345:respawn:/sbin/agetty tty3 9600
+4:2345:respawn:/sbin/agetty tty4 9600
+5:2345:respawn:/sbin/agetty tty5 9600
+6:2345:respawn:/sbin/agetty tty6 9600
+ 
+表示系统可以有六个控制台，可以用ALT+(F1~F6)来切换。而/sbin/agetty就是一个登陆验证程序，执行它，会提示用户输入用户名和密码，然后启动一个指定的shell（在passwd文件中指定的）。
+ 
+所以，我们只需将其修改为不执行agettty，而是执行自己编写的一个脚本，就可以跳过用户名和密码的输入。修改如下：
+ 
+1:2345:respawn:/root/logintest tty1 9600
+ 
+这里我在/root/下放了一个测试脚本，这样系统启动时就会执行那个脚本，脚本内容：
+ 
+#!/bin/sh
+/bin/login -f root
+ 
+脚本其实就是执行了一个root用户的登陆而已，如果有其他要求，也可以添加到脚本中。
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+ ubuntu自动登录tty1(shell,text)配置
+1.写脚本autologin
+
+代码:
+#!/bin/bash
+/bin/login -f #你的用户名
+移动到/usr/bin/下,并且用chmod +x autologin设置可执行权限
+
+2.修改/etc/init/tty1.conf
+
+修改前：
+
+# tty1 - getty
+#
+# This service maintains a getty on tty1 from the point the system is
+# started until it is shut down again.
+
+start on stopped rc RUNLEVEL=[2345]
+stop on runlevel [!2345]
+
+respawn
+exec /sbin/getty -8 38400 tty1
+
+修改后：
+
+# tty1 - getty
+#
+# This service maintains a getty on tty1 from the point the system is
+# started until it is shut down again.
+
+start on stopped rc RUNLEVEL=[2345]
+stop on runlevel [!2345]
+
+respawn
+exec /sbin/getty -n -l /usr/bin/autologin -8 38400 tty1
+
+
+
+
+
+getty是Unix类操作系统启动时必须的三个步骤之一，用来开启终端，进行终端的初始化。
+目前一般常用的getty程序有如下几种：
+1.agetty（有时直接称为getty）：容易设置，无须配置文件。适用于直接连接的终端；
+2.getty（getty_ps的一部分）：适用于直接连接的终端；
+3.mgetty：最适合于通过modem连接，也可用于直连；
+4.uugetty：仅用于通过modem连接终端，是getty_ps软件包的部分；
+5.mingetty：简单的getty。适用于控制台终端或虚拟终端；
+6.fbgetty：适用于控制台或虚拟终端。
